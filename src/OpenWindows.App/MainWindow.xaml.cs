@@ -20,6 +20,12 @@ public partial class MainWindow : FluentWindow
             Dispatcher.BeginInvoke(() => TrayIcon.ShowNotification(title, body)));
         AppServices.Notifications.Activated += (_, _) => Dispatcher.BeginInvoke(ShowFromTray);
 
+        AppServices.Monitor.BackgroundHogDetected += (_, hog) =>
+            Dispatcher.BeginInvoke(() => AppServices.NotifyUser(
+                hog.Name + " is busy in the background",
+                $"Using about {hog.CpuPercent:0.0}% CPU ({hog.RamMb} MB memory) with no window open. Open the Processes page to close it.",
+                false));
+
         ThemeService.Apply(AppServices.Settings.Current.Theme, this);
 
         TrayIcon.TrayLeftMouseUp += (_, _) => ShowFromTray();
@@ -53,6 +59,7 @@ public partial class MainWindow : FluentWindow
     {
         AppPage.Optimize => typeof(OptimizePage),
         AppPage.Monitor => typeof(MonitorPage),
+        AppPage.Processes => typeof(ProcessesPage),
         AppPage.History => typeof(HistoryPage),
         AppPage.Settings => typeof(SettingsPage),
         _ => typeof(DashboardPage)

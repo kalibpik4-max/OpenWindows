@@ -41,6 +41,8 @@
                         </StackPanel>
                         <CheckBox Content="Start monitoring automatically when OpenWindows starts"
                                   Margin="0,10,0,0" IsChecked="{Binding MonitoringAutoStart, Mode=TwoWay}" />
+                        <CheckBox Content="Tell me when apps run in the background without being used"
+                                  Margin="0,10,0,0" IsChecked="{Binding BackgroundAlertsEnabled, Mode=TwoWay}" />
                     </StackPanel>
                 </Border>
 

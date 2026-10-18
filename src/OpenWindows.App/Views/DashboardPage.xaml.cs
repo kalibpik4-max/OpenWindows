@@ -11,6 +11,12 @@ public partial class DashboardPage : Page
     {
         DataContext = vm;
         InitializeComponent();
-        Loaded += (_, _) => vm.RefreshFromLastScan();
+        vm.NavigateRequested += page => MainWindow.Instance?.NavigateTo(page);
+        Loaded += (_, _) =>
+        {
+            vm.RefreshFromLastScan();
+            vm.SyncMonitoringState();
+            _ = vm.RefreshUnusedAsync(true);
+        };
     }
 }

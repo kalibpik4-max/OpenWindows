@@ -46,6 +46,13 @@ public sealed class ProcessRowVM
     public required int Id { get; init; }
     public required double CpuPercent { get; init; }
     public required long RamMb { get; init; }
+    public bool HasWindow { get; init; } = true;
     public string CpuText => CpuPercent.ToString("0.0") + "%";
-    public string RamText => RamMb.ToString();
+    public string RamText => RamMb >= 1024
+        ? (RamMb / 1024.0).ToString("0.0") + " GB"
+        : RamMb + " MB";
+    public string CpuLevel => CpuPercent >= 25 ? "High" : CpuPercent >= 8 ? "Medium" : "Low";
+    public bool IsBackground => !HasWindow;
+    public string StatusText => HasWindow ? "In use" : "Background";
+    public bool CanEnd => !ProtectedProcesses.IsProtected(Name);
 }

@@ -10,8 +10,17 @@ public sealed class DashboardViewModel : ViewModelBase
     private readonly SystemSpecs specs;
     private int healthScore = -1;
     private string lastScanText = "No scan yet.";
+    private bool isMonitoring;
+    private bool unusedBusy;
+    private DateTime lastUnusedRefresh = DateTime.MinValue;
 
     public ObservableCollection<FindingItemVM> RecentFindings { get; } = new();
+
+    public ObservableCollection<double> CpuHistory { get; } = new();
+
+    public ObservableCollection<double> RamHistory { get; } = new();
+
+    public ObservableCollection<ProcessItemVM> UnusedProcesses { get; } = new();
 
     public event Action<AppPage>? NavigateRequested;
 
@@ -22,6 +31,8 @@ public sealed class DashboardViewModel : ViewModelBase
     public RelayCommand OpenMonitorCommand { get; }
 
     public RelayCommand OpenHistoryCommand { get; }
+
+    public RelayCommand OpenProcessesCommand { get; }
 
     public AsyncRelayCommand UndoLastCommand { get; }
 
@@ -39,13 +50,116 @@ public sealed class DashboardViewModel : ViewModelBase
             {
                 AppServices.Monitor.Start();
             }
+            IsMonitoring = true;
             NavigateRequested?.Invoke(AppPage.Monitor);
         });
         OpenHistoryCommand = new RelayCommand(() => NavigateRequested?.Invoke(AppPage.History));
+        OpenProcessesCommand = new RelayCommand(() => NavigateRequested?.Invoke(AppPage.Processes));
         UndoLastCommand = new AsyncRelayCommand(UndoLastAsync);
 
+        foreach (var sample in AppServices.Monitor.History)
+        {
+            AddBounded(CpuHistory, sample.CpuPercent);
+            AddBounded(RamHistory, sample.RamPercent);
+        }
+
         AppServices.Monitor.SampleReady += OnSampleReady;
+        SyncMonitoringState();
         RefreshFromLastScan();
+    }
+
+    public bool IsMonitoring
+    {
+        get => isMonitoring;
+        private set
+        {
+            if (SetProperty(ref isMonitoring, value))
+            {
+                OnPropertyChanged(nameof(MonitorButtonText));
+            }
+        }
+    }
+
+    public string MonitorButtonText => IsMonitoring ? "Open monitor" : "Start monitoring";
+
+    public void SyncMonitoringState()
+    {
+        IsMonitoring = AppServices.Monitor.IsRunning;
+    }
+
+    private string cpuLevel = "Low";
+    public string CpuLevel
+    {
+        get => cpuLevel;
+        private set => SetProperty(ref cpuLevel, value);
+    }
+
+    private string ramLevel = "Low";
+    public string RamLevel
+    {
+        get => ramLevel;
+        private set => SetProperty(ref ramLevel, value);
+    }
+
+    private string diskLevel = "Low";
+    public string DiskLevel
+    {
+        get => diskLevel;
+        private set => SetProperty(ref diskLevel, value);
+    }
+
+    public bool HasUnused => UnusedProcesses.Count > 0;
+
+    private string unusedSummaryText = "";
+    public string UnusedSummaryText
+    {
+        get => unusedSummaryText;
+        private set => SetProperty(ref unusedSummaryText, value);
+    }
+
+    public async Task RefreshUnusedAsync(bool force)
+    {
+        if (unusedBusy)
+        {
+            return;
+        }
+        if (!force && (DateTime.Now - lastUnusedRefresh).TotalSeconds < 15)
+        {
+            return;
+        }
+        unusedBusy = true;
+        try
+        {
+            var snapshot = await Task.Run(() => ProcessScanService.Snapshot());
+            var unused = snapshot
+                .Where(p => ProcessScanService.IsUnused(p))
+                .OrderByDescending(ProcessScanService.Score)
+                .Take(3)
+                .Select(p => new ProcessItemVM(p))
+                .ToList();
+
+            UnusedProcesses.Clear();
+            foreach (var item in unused)
+            {
+                UnusedProcesses.Add(item);
+            }
+
+            var allUnused = snapshot.Where(p => ProcessScanService.IsUnused(p)).ToList();
+            var reclaimable = allUnused.Sum(p => p.RamMb) / 1024.0;
+            UnusedSummaryText = allUnused.Count == 0
+                ? ""
+                : $"{allUnused.Count} app(s) are running in the background without being used - about {reclaimable:0.0} GB of memory can be freed.";
+            OnPropertyChanged(nameof(HasUnused));
+            lastUnusedRefresh = DateTime.Now;
+        }
+        catch (Exception ex)
+        {
+            Log.Write("Unused app refresh failed: " + ex.Message);
+        }
+        finally
+        {
+            unusedBusy = false;
+        }
     }
 
     public string CpuName => specs.CpuName;
@@ -176,11 +290,32 @@ public sealed class DashboardViewModel : ViewModelBase
         {
             CpuPercent = sample.CpuPercent;
             CpuPercentText = $"{sample.CpuPercent:0}%";
+            CpuLevel = Level(sample.CpuPercent, 85, 60);
+            AddBounded(CpuHistory, sample.CpuPercent);
             RamPercent = sample.RamPercent;
             RamText = $"{sample.RamUsedGb:N1} GB of {sample.RamTotalGb:N1} GB";
+            RamLevel = Level(sample.RamPercent, 85, 70);
+            AddBounded(RamHistory, sample.RamPercent);
             DiskPercent = sample.DiskPercent;
             DiskText = $"{sample.DiskFreeGb:N1} GB free of {sample.DiskTotalGb:N0} GB";
+            DiskLevel = Level(sample.DiskPercent, 90, 80);
+            IsMonitoring = true;
+            _ = RefreshUnusedAsync(false);
         });
+    }
+
+    private static string Level(double value, double high, double medium)
+    {
+        return value >= high ? "High" : value >= medium ? "Medium" : "Low";
+    }
+
+    private static void AddBounded(ObservableCollection<double> collection, double value)
+    {
+        collection.Add(value);
+        while (collection.Count > 120)
+        {
+            collection.RemoveAt(0);
+        }
     }
 
     private async Task UndoLastAsync()

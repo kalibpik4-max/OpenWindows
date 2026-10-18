@@ -24,10 +24,15 @@ public sealed class MonitorViewModel : ViewModelBase
 
     public RelayCommand RefreshPowerPlanCommand { get; }
 
+    public AsyncRelayCommand<ProcessRowVM> EndProcessCommand { get; }
+
+    public Func<string, string, Task<bool>>? ConfirmAsync { get; set; }
+
     public MonitorViewModel()
     {
         ToggleMonitoringCommand = new RelayCommand(ToggleMonitoring);
         RefreshPowerPlanCommand = new RelayCommand(RefreshPowerPlan);
+        EndProcessCommand = new AsyncRelayCommand<ProcessRowVM>(EndProcessAsync);
 
         isMonitoring = AppServices.Monitor.IsRunning;
         AppServices.Monitor.SampleReady += OnSampleReady;
@@ -171,11 +176,38 @@ public sealed class MonitorViewModel : ViewModelBase
                     Name = process.Name,
                     Id = process.Id,
                     CpuPercent = process.CpuPercent,
-                    RamMb = process.RamMb
+                    RamMb = process.RamMb,
+                    HasWindow = process.HasWindow
                 });
             }
             IsMonitoring = true;
         });
+    }
+
+    private async Task EndProcessAsync(ProcessRowVM row)
+    {
+        if (row == null || ProtectedProcesses.IsProtected(row.Name))
+        {
+            return;
+        }
+        if (ConfirmAsync != null)
+        {
+            var confirmed = await ConfirmAsync("End process",
+                $"End {row.Name} (PID {row.Id})? Unsaved work in it will be lost.");
+            if (!confirmed)
+            {
+                return;
+            }
+        }
+
+        if (ProcessScanService.TryKill(row.Id, row.Name, out var message))
+        {
+            AppServices.NotifyUser("Process ended", message, true);
+        }
+        else
+        {
+            AppServices.NotifyUser("Could not end process", message, false);
+        }
     }
 
     private void AppendPoint(MonitorSample sample)

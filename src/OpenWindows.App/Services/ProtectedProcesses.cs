@@ -10,7 +10,7 @@ public static class ProtectedProcesses
         "audiodg", "msmpeng", "nissrv", "securityhealthservice", "securityhealthsystray",
         "widgets", "widgetservice", "shellexperiencehost", "startmenuexperiencehost",
         "searchhost", "searchindexer", "textinputhost", "powershell", "pwsh", "conhost",
-        "windowsterminal", "applicationframehost", "runtimebroker", "openwindows",
+        "windowsterminal", "applicationframehost", "runtimebroker", "openwindows", "opencode",
         "sgrmbroker", "lsaiso", "wmiprvse", "dllhost", "spoolsv", "taskmgr"
     };
 

@@ -10,6 +10,7 @@ public enum AppPage
     Dashboard,
     Optimize,
     Monitor,
+    Processes,
     History,
     Settings
 }

@@ -11,6 +11,7 @@ public partial class MonitorPage : Page
     {
         DataContext = vm;
         InitializeComponent();
+        vm.ConfirmAsync = Dialogs.ConfirmAsync;
         Loaded += (_, _) => vm.SyncMonitoringState();
     }
 }

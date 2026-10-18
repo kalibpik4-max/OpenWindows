@@ -4,13 +4,14 @@ namespace OpenWindows.Services;
 
 public sealed class AppSettings
 {
-    public string Theme { get; set; } = "System";
+    public string Theme { get; set; } = "Dark";
     public bool CpuAlertsEnabled { get; set; } = true;
     public int CpuAlertThreshold { get; set; } = 85;
     public bool MinimizeToTray { get; set; } = true;
     public bool RunAtStartup { get; set; }
     public bool ToastNotificationsEnabled { get; set; } = true;
-    public bool MonitoringAutoStart { get; set; }
+    public bool MonitoringAutoStart { get; set; } = true;
+    public bool BackgroundAlertsEnabled { get; set; } = true;
 }
 
 public sealed class SettingsService

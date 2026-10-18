@@ -8,12 +8,13 @@
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemesDictionary Theme="Dark" />
                 <ui:ControlsDictionary />
+                <ResourceDictionary Source="Themes/PaletteDark.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <FontFamily x:Key="AppFont">Segoe UI Variable Text, Segoe UI, Arial</FontFamily>
             <Style x:Key="CardStyle" TargetType="Border">
-                <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}" />
+                <Setter Property="Background" Value="{DynamicResource AppCardBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource AppCardBorderBrush}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="CornerRadius" Value="8" />
                 <Setter Property="Padding" Value="16" />
@@ -22,7 +23,13 @@
                 <Setter Property="CornerRadius" Value="10" />
                 <Setter Property="Padding" Value="8,2" />
                 <Setter Property="VerticalAlignment" Value="Top" />
-                <Setter Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+                <Setter Property="Background" Value="{DynamicResource AppBadgeBackgroundBrush}" />
+            </Style>
+            <Style x:Key="StatusPillStyle" TargetType="Border">
+                <Setter Property="CornerRadius" Value="9" />
+                <Setter Property="Padding" Value="8,1" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Background" Value="{DynamicResource AppBadgeBackgroundBrush}" />
             </Style>
         </ResourceDictionary>
     </Application.Resources>

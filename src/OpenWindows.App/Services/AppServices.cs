@@ -24,6 +24,7 @@ public static class AppServices
         Settings.Load();
         Monitor.AlertsEnabled = Settings.Current.CpuAlertsEnabled;
         Monitor.AlertThreshold = Settings.Current.CpuAlertThreshold;
+        Monitor.BackgroundAlertsEnabled = Settings.Current.BackgroundAlertsEnabled;
         Notifications.Enabled = Settings.Current.ToastNotificationsEnabled;
         Log.Write($"OpenWindows started. Admin: {ElevationHelper.IsAdmin}");
     }
@@ -49,6 +50,7 @@ public static class AppServices
     {
         Monitor.AlertsEnabled = Settings.Current.CpuAlertsEnabled;
         Monitor.AlertThreshold = Settings.Current.CpuAlertThreshold;
+        Monitor.BackgroundAlertsEnabled = Settings.Current.BackgroundAlertsEnabled;
         Notifications.Enabled = Settings.Current.ToastNotificationsEnabled;
     }
 

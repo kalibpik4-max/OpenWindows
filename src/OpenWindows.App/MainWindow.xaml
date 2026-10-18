@@ -50,6 +50,12 @@
                         <ui:SymbolIcon Symbol="Gauge24" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="Processes" TargetPageType="{x:Type pages:ProcessesPage}"
+                                       NavigationCacheMode="Enabled">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="AppsList24" />
+                    </ui:NavigationViewItem.Icon>
+                </ui:NavigationViewItem>
                 <ui:NavigationViewItem Content="History" TargetPageType="{x:Type pages:HistoryPage}"
                                        NavigationCacheMode="Enabled">
                     <ui:NavigationViewItem.Icon>

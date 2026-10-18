@@ -10,10 +10,11 @@ Working preview (0.9.0). Core scanning, fixing, undo, monitoring, tray icon and 
 
 ## Features
 
-- **Dashboard** - system info and a performance health score at a glance
+- **Dashboard** - system information, a performance health score, and live CPU/RAM sparklines at a glance
 - **Optimize** - scans startup apps, services, scheduled tasks, Windows tweaks, disk cleanup targets and current CPU/RAM hogs; every finding is explained, risk-labelled and opt-in
 - **Safe by design** - every change is backed up to JSON before applying; one click undoes a whole session (registry, services, tasks, startup shortcuts, power plan)
-- **Monitor** - live CPU/RAM/disk graphs, top processes, and toast notifications when the CPU stays pegged
+- **Monitor** - live CPU/RAM/disk graphs, top processes, colored per-process load, and toast notifications when the CPU stays pegged or an app hogs resources in the background
+- **Processes** - every running app in one list, background apps that are not in use highlighted and easy to close (select several or end all unused, with a confirmation)
 - **History** - browse every past apply session and undo any of them
 - **Tray icon** - runs quietly in the background, one click to show
 

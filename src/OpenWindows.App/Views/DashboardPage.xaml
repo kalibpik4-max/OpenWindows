@@ -3,14 +3,40 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:vm="clr-namespace:OpenWindows.ViewModels"
+      xmlns:controls="clr-namespace:OpenWindows.Controls"
       Title="Dashboard"
       Background="Transparent">
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Page.Resources>
     <Grid Margin="28,12,28,0">
         <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,28">
             <StackPanel>
-                <ui:TextBlock FontTypography="Title" Text="Dashboard" />
-                <ui:TextBlock FontTypography="Body" Appearance="Secondary" Margin="0,4,0,20" TextWrapping="Wrap"
-                              Text="Your PC at a glance. Live numbers update whenever monitoring is running." />
+                <Grid>
+                    <StackPanel>
+                        <ui:TextBlock FontTypography="Title" Text="Dashboard" />
+                        <ui:TextBlock FontTypography="Body" Appearance="Secondary" Margin="0,4,0,20" TextWrapping="Wrap"
+                                      Text="Your PC at a glance - live numbers while monitoring runs, plus what is safe to close." />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                Margin="0,8,0,0" Visibility="{Binding IsMonitoring, Converter={StaticResource BoolToVis}}">
+                        <Ellipse Width="8" Height="8" Fill="{DynamicResource AppSuccessBrush}" VerticalAlignment="Center">
+                            <Ellipse.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                             From="1.0" To="0.25" Duration="0:0:1" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Ellipse.Triggers>
+                        </Ellipse>
+                        <TextBlock Text="LIVE" FontSize="12" FontWeight="SemiBold" Margin="8,0,0,0"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource AppSuccessBrush}" />
+                    </StackPanel>
+                </Grid>
 
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -23,27 +49,76 @@
                     <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,12,0">
                         <StackPanel>
                             <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Text="CPU" />
-                            <ui:TextBlock FontTypography="Subtitle" Text="{Binding CpuPercentText}" Margin="0,2,0,0" />
-                            <ProgressBar Value="{Binding CpuPercent, Mode=OneWay}" Maximum="100" Height="4" Margin="0,10,0,8" />
-                            <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" Text="{Binding CpuName}"
-                                          TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding CpuPercentText}" FontSize="24" FontWeight="SemiBold" Margin="0,2,0,0">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{DynamicResource AppSuccessBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding CpuLevel}" Value="Medium">
+                                                <Setter Property="Foreground" Value="{DynamicResource AppCautionBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding CpuLevel}" Value="High">
+                                                <Setter Property="Foreground" Value="{DynamicResource AppCriticalBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <ProgressBar Value="{Binding CpuPercent, Mode=OneWay}" Maximum="100" Height="4" Margin="0,10,0,6" />
+                            <controls:SparklineChart Values="{Binding CpuHistory}" Height="28"
+                                                     Stroke="{DynamicResource AppAccentBrush}" />
+                            <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" Margin="0,6,0,0"
+                                          Text="{Binding CpuName}" TextWrapping="Wrap" />
                         </StackPanel>
                     </Border>
 
                     <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="0,0,12,0">
                         <StackPanel>
                             <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Text="Memory" />
-                            <ui:TextBlock FontTypography="Subtitle" Text="{Binding RamText}" Margin="0,2,0,0" />
-                            <ProgressBar Value="{Binding RamPercent, Mode=OneWay}" Maximum="100" Height="4" Margin="0,10,0,8" />
-                            <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" Text="RAM in use" />
+                            <TextBlock Text="{Binding RamText}" FontSize="20" FontWeight="SemiBold" Margin="0,4,0,0"
+                                       TextWrapping="Wrap">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{DynamicResource AppSuccessBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding RamLevel}" Value="Medium">
+                                                <Setter Property="Foreground" Value="{DynamicResource AppCautionBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding RamLevel}" Value="High">
+                                                <Setter Property="Foreground" Value="{DynamicResource AppCriticalBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <ProgressBar Value="{Binding RamPercent, Mode=OneWay}" Maximum="100" Height="4" Margin="0,10,0,6" />
+                            <controls:SparklineChart Values="{Binding RamHistory}" Height="28"
+                                                     Stroke="{DynamicResource AppSuccessBrush}" />
+                            <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" Margin="0,6,0,0"
+                                          Text="RAM in use" />
                         </StackPanel>
                     </Border>
 
                     <Border Grid.Column="2" Style="{StaticResource CardStyle}" Margin="0,0,12,0">
                         <StackPanel>
                             <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Text="Disk C:" />
-                            <ui:TextBlock FontTypography="Subtitle" Text="{Binding DiskText}" Margin="0,2,0,0" />
-                            <ProgressBar Value="{Binding DiskPercent, Mode=OneWay}" Maximum="100" Height="4" Margin="0,10,0,8" />
+                            <TextBlock Text="{Binding DiskText}" FontSize="20" FontWeight="SemiBold" Margin="0,4,0,0"
+                                       TextWrapping="Wrap">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{DynamicResource AppSuccessBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DiskLevel}" Value="Medium">
+                                                <Setter Property="Foreground" Value="{DynamicResource AppCautionBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding DiskLevel}" Value="High">
+                                                <Setter Property="Foreground" Value="{DynamicResource AppCriticalBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <ProgressBar Value="{Binding DiskPercent, Mode=OneWay}" Maximum="100" Height="4" Margin="0,10,0,14" />
                             <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" Text="Space used" />
                         </StackPanel>
                     </Border>
@@ -60,6 +135,56 @@
                         </StackPanel>
                     </Border>
                 </Grid>
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,16,0,0"
+                        Visibility="{Binding HasUnused, Converter={StaticResource BoolToVis}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Symbol="Warning24" FontSize="18" Margin="0,0,8,0"
+                                               Foreground="{DynamicResource AppCautionBrush}" VerticalAlignment="Center" />
+                                <ui:TextBlock FontTypography="BodyStrong" Text="Running in the background - not in use" />
+                            </StackPanel>
+                            <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Margin="0,4,0,10"
+                                          TextWrapping="Wrap" Text="{Binding UnusedSummaryText}" />
+                            <ItemsControl ItemsSource="{Binding UnusedProcesses}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:ProcessItemVM}">
+                                        <Grid Margin="0,3,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="90" />
+                                                <ColumnDefinition Width="90" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                                <Ellipse Width="6" Height="6" Fill="{DynamicResource AppCautionBrush}"
+                                                         VerticalAlignment="Center" Margin="2,0,10,0" />
+                                                <TextBlock Text="{Binding Name}" FontSize="13" VerticalAlignment="Center"
+                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="{Binding CpuText}" FontSize="12.5"
+                                                       TextAlignment="Right" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock Grid.Column="2" Text="{Binding RamText}" FontSize="12.5"
+                                                       TextAlignment="Right" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                        <ui:Button Grid.Column="1" Appearance="Primary" VerticalAlignment="Center"
+                                   Content="Review and close" Command="{Binding OpenProcessesCommand}">
+                            <ui:Button.Icon>
+                                <ui:SymbolIcon Symbol="AppsList24" />
+                            </ui:Button.Icon>
+                        </ui:Button>
+                    </Grid>
+                </Border>
 
                 <Grid Margin="0,16,0,0">
                     <Grid.ColumnDefinitions>
@@ -93,10 +218,17 @@
                         <StackPanel>
                             <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Text="Quick actions" />
                             <ui:Button Margin="0,12,0,0" HorizontalAlignment="Stretch"
-                                       HorizontalContentAlignment="Left" Content="Start monitoring"
+                                       HorizontalContentAlignment="Left" Content="{Binding MonitorButtonText}"
                                        Command="{Binding OpenMonitorCommand}">
                                 <ui:Button.Icon>
                                     <ui:SymbolIcon Symbol="Play24" />
+                                </ui:Button.Icon>
+                            </ui:Button>
+                            <ui:Button Margin="0,8,0,0" HorizontalAlignment="Stretch"
+                                       HorizontalContentAlignment="Left" Content="Open processes"
+                                       Command="{Binding OpenProcessesCommand}">
+                                <ui:Button.Icon>
+                                    <ui:SymbolIcon Symbol="AppsList24" />
                                 </ui:Button.Icon>
                             </ui:Button>
                             <ui:Button Margin="0,8,0,0" HorizontalAlignment="Stretch"

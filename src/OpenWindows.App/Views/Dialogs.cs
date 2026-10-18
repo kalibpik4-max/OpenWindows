@@ -33,12 +33,15 @@ public static class Dialogs
     public static async Task<IReadOnlySet<(int Id, string Name)>?> ConfirmKillsAsync(
         IReadOnlyList<KillProcessAction> kills)
     {
+        var single = kills.Count == 1;
         var list = string.Join(Environment.NewLine, kills.Select(k => $"- {k.Name} (PID {k.Id})"));
         var box = new WpfMessageBox
         {
-            Title = "End processes",
-            Content = $"End these {kills.Count} process(es)? Unsaved work in them will be lost.{Environment.NewLine}{Environment.NewLine}{list}",
-            PrimaryButtonText = "End them",
+            Title = single ? "End process" : "End processes",
+            Content = single
+                ? $"End {kills[0].Name} (PID {kills[0].Id})? Unsaved work in it will be lost."
+                : $"End these {kills.Count} process(es)? Unsaved work in them will be lost.{Environment.NewLine}{Environment.NewLine}{list}",
+            PrimaryButtonText = single ? "End it" : "End them",
             CloseButtonText = "Skip"
         };
         var result = await box.ShowDialogAsync();

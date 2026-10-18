@@ -165,6 +165,17 @@ public sealed class SettingsViewModel : ViewModelBase
         }
     }
 
+    public bool BackgroundAlertsEnabled
+    {
+        get => AppServices.Settings.Current.BackgroundAlertsEnabled;
+        set
+        {
+            AppServices.Settings.Current.BackgroundAlertsEnabled = value;
+            PersistAndSync();
+            OnPropertyChanged();
+        }
+    }
+
     private void ApplyTheme(string theme)
     {
         AppServices.Settings.Current.Theme = theme;

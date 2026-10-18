@@ -2,7 +2,9 @@ using System.Diagnostics;
 
 namespace OpenWindows.Services;
 
-public sealed record ProcessInfoSnapshot(string Name, int Id, double CpuPercent, long RamMb);
+public sealed record ProcessInfoSnapshot(string Name, int Id, double CpuPercent, long RamMb, bool HasWindow);
+
+public sealed record BackgroundHogInfo(string Name, int Id, double CpuPercent, long RamMb);
 
 public sealed record MonitorSample(
     DateTime Timestamp,
@@ -22,6 +24,8 @@ public sealed class MonitorService : IDisposable
     private readonly object gate = new();
     private readonly Queue<MonitorSample> history = new();
     private readonly Dictionary<int, double> lastProcessCpuMs = new();
+    private readonly Dictionary<string, int> hogStreaks = new();
+    private readonly Dictionary<string, DateTime> lastHogAlert = new();
 
     private CancellationTokenSource? cancellation;
     private Task? loopTask;
@@ -35,16 +39,23 @@ public sealed class MonitorService : IDisposable
 
     private const int HistoryLimit = 150;
     private const int IntervalMs = 2000;
+    private const double HogCpuThreshold = 6.0;
+    private const int HogStreakLimit = 5;
+    private static readonly TimeSpan HogCooldown = TimeSpan.FromMinutes(15);
 
     public bool IsRunning { get; private set; }
 
     public bool AlertsEnabled { get; set; } = true;
+
+    public bool BackgroundAlertsEnabled { get; set; } = true;
 
     public int AlertThreshold { get; set; } = 85;
 
     public event EventHandler<MonitorSample>? SampleReady;
 
     public event EventHandler<CpuAlertInfo>? CpuAlert;
+
+    public event EventHandler<BackgroundHogInfo>? BackgroundHogDetected;
 
     public IReadOnlyList<MonitorSample> History
     {
@@ -78,6 +89,7 @@ public sealed class MonitorService : IDisposable
         streak = 0;
         hasSystemTimes = false;
         lastProcessCpuMs.Clear();
+        hogStreaks.Clear();
         lastTick = DateTime.MinValue;
         cancellation = new CancellationTokenSource();
         loopTask = Task.Run(() => LoopAsync(cancellation.Token));
@@ -150,11 +162,21 @@ public sealed class MonitorService : IDisposable
                     var percent = (cpuMs - previousMs) / (elapsedMs * cores) * 100;
                     if (percent >= 0.5)
                     {
+                        var hasWindow = false;
+                        try
+                        {
+                            hasWindow = process.MainWindowHandle != IntPtr.Zero;
+                        }
+                        catch
+                        {
+                        }
+
                         processes.Add(new ProcessInfoSnapshot(
                             process.ProcessName,
                             process.Id,
                             Math.Round(percent, 1),
-                            process.WorkingSet64 / 1024 / 1024));
+                            process.WorkingSet64 / 1024 / 1024,
+                            hasWindow));
                     }
                 }
             }
@@ -210,6 +232,63 @@ public sealed class MonitorService : IDisposable
                 topProcess?.Name ?? "unknown",
                 topProcess?.CpuPercent ?? 0,
                 AlertThreshold));
+        }
+
+        if (BackgroundAlertsEnabled)
+        {
+            EvaluateBackgroundHogs(processes, now);
+        }
+    }
+
+    private void EvaluateBackgroundHogs(List<ProcessInfoSnapshot> processes, DateTime now)
+    {
+        try
+        {
+            var hogs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var process in processes)
+            {
+                if (process.HasWindow || process.CpuPercent < HogCpuThreshold)
+                {
+                    continue;
+                }
+                if (ProtectedProcesses.IsProtected(process.Name))
+                {
+                    continue;
+                }
+                hogs.Add(process.Name);
+                hogStreaks[process.Name] = hogStreaks.TryGetValue(process.Name, out var current) ? current + 1 : 1;
+
+                if (hogStreaks[process.Name] < HogStreakLimit)
+                {
+                    continue;
+                }
+                if (lastHogAlert.TryGetValue(process.Name, out var last) && now - last < HogCooldown)
+                {
+                    continue;
+                }
+
+                lastHogAlert[process.Name] = now;
+                hogStreaks[process.Name] = 0;
+                BackgroundHogDetected?.Invoke(this,
+                    new BackgroundHogInfo(process.Name, process.Id, process.CpuPercent, process.RamMb));
+            }
+
+            foreach (var name in hogStreaks.Keys.Where(n => !hogs.Contains(n)).ToList())
+            {
+                hogStreaks.Remove(name);
+            }
+
+            if (lastHogAlert.Count > 200)
+            {
+                foreach (var name in lastHogAlert.Where(p => now - p.Value > TimeSpan.FromHours(2)).Select(p => p.Key).ToList())
+                {
+                    lastHogAlert.Remove(name);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Write("Background hog evaluation failed: " + ex.Message);
         }
     }
 

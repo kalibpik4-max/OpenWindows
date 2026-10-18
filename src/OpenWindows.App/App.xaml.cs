@@ -27,6 +27,24 @@ public partial class App : Application
         {
             window.Hide();
         }
+
+        var screenshotDir = GetArgValue(e.Args, "--screenshot");
+        if (!string.IsNullOrEmpty(screenshotDir))
+        {
+            ScreenshotRunner.Start(window, screenshotDir, GetArgValue(e.Args, "--screenshot-pages"));
+        }
+    }
+
+    private static string? GetArgValue(string[] args, string name)
+    {
+        for (var i = 0; i < args.Length - 1; i++)
+        {
+            if (string.Equals(args[i], name, StringComparison.OrdinalIgnoreCase))
+            {
+                return args[i + 1];
+            }
+        }
+        return null;
     }
 
     protected override void OnExit(ExitEventArgs e)
