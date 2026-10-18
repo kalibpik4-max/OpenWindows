@@ -214,6 +214,8 @@ public sealed class DashboardViewModel : ViewModelBase
         private set => SetProperty(ref diskPercent, value);
     }
 
+    public bool HasHealthScore => healthScore >= 0;
+
     public string HealthScoreText => healthScore < 0 ? "-" : healthScore.ToString();
 
     public string HealthLabel => healthScore switch
@@ -252,7 +254,7 @@ public sealed class DashboardViewModel : ViewModelBase
         {
             healthScore = -1;
             OpenIssueCount = 0;
-            LastScanText = "No scan yet - run one to see what this PC can improve.";
+            LastScanText = "";
         }
         else
         {
@@ -273,6 +275,7 @@ public sealed class DashboardViewModel : ViewModelBase
         }
 
         OnPropertyChanged(nameof(HealthScoreText));
+        OnPropertyChanged(nameof(HasHealthScore));
         OnPropertyChanged(nameof(HealthLabel));
         OnPropertyChanged(nameof(HealthDescription));
         OnPropertyChanged(nameof(OpenIssueCount));

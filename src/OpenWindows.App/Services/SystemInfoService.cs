@@ -43,6 +43,10 @@ public static class SystemInfoService
             if (build != null)
             {
                 osBuild = $"{build}.{ubr}";
+                if (int.TryParse(build, out var buildNumber) && buildNumber >= 22000)
+                {
+                    osName = osName.Replace("Windows 10", "Windows 11");
+                }
             }
         }
         catch

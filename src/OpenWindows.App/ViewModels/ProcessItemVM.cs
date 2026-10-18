@@ -99,13 +99,13 @@ public sealed class ProcessItemVM : ViewModelBase
         }
     }
 
-    public string CpuText => CpuPercent < 0.1 ? "-" : CpuPercent.ToString("0.0") + "%";
+    public string CpuText => CpuPercent < 0.1 ? "0%" : CpuPercent.ToString("0.0") + "%";
 
     public string RamText => RamMb >= 1024
         ? (RamMb / 1024.0).ToString("0.0") + " GB"
         : RamMb + " MB";
 
-    public string StatusText => IsProtected ? "System" : HasWindow ? "In use" : "Background";
+    public string StatusText => IsProtected ? "Protected" : HasWindow ? "In use" : "Background";
 
     public double SortScore => (IsUnused ? 1_000_000 : 0) + CpuPercent * 1000 + RamMb;
 

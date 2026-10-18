@@ -27,10 +27,10 @@
                         </ui:Button>
                         <ui:Button Margin="8,0,0,0" Content="Check safe only" Command="{Binding CheckSafeCommand}" />
                         <ui:Button Margin="8,0,0,0" Content="Uncheck all" Command="{Binding UncheckAllCommand}" />
-                        <ui:Button Margin="8,0,0,0" Content="Restart as admin"
+                        <ui:Button Margin="8,0,0,0" Content="Restart as admin" Appearance="Secondary"
                                    Command="{Binding RestartAsAdminCommand}">
                             <ui:Button.Style>
-                                <Style TargetType="ui:Button">
+                                <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsAdmin}" Value="False">
@@ -66,24 +66,29 @@
         </StackPanel>
 
         <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,14,0,0" Padding="8">
-            <ListView ItemsSource="{Binding Findings}" Background="Transparent" BorderThickness="0"
-                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        <Setter Property="Padding" Value="8,4" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.ItemTemplate>
-                    <DataTemplate DataType="{x:Type vm:FindingItemVM}">
-                        <Grid Margin="0,4">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" IsEnabled="{Binding HasAction}"
-                                      VerticalAlignment="Top" Margin="2,3,12,0" />
+            <Grid>
+                <ListView x:Name="FindingsList" ItemsSource="{Binding Findings}" Background="Transparent"
+                          BorderThickness="0"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Padding" Value="8,4" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:FindingItemVM}">
+                            <Grid Margin="0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ToggleButton Style="{StaticResource AppCheckStyle}"
+                                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                              IsEnabled="{Binding HasAction}"
+                                              AutomationProperties.Name="{Binding Title, StringFormat=Select {0}}"
+                                              VerticalAlignment="Top" Margin="2,3,12,0" />
                             <StackPanel Grid.Column="1">
                                 <TextBlock Text="{Binding Title}" TextWrapping="Wrap" FontWeight="SemiBold"
                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
@@ -133,7 +138,29 @@
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
-            </ListView>
+                </ListView>
+
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,24"
+                            IsHitTestVisible="False">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasItems, ElementName=FindingsList}" Value="False">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <ui:SymbolIcon Symbol="Search24" FontSize="30" HorizontalAlignment="Center"
+                                   Foreground="{DynamicResource AppTextTertiaryBrush}" />
+                    <ui:TextBlock FontTypography="BodyStrong" Margin="0,12,0,0" HorizontalAlignment="Center"
+                                  Text="Nothing scanned yet" />
+                    <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Margin="0,4,0,0"
+                                  HorizontalAlignment="Center"
+                                  Text="Click Scan my PC above - safe wins are checked for you, risky ones are left off." />
+                </StackPanel>
+            </Grid>
         </Border>
 
         <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,14,0,0" Padding="12">

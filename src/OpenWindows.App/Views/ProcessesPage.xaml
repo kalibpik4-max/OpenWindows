@@ -100,6 +100,7 @@
                 </Grid>
 
                 <ListView Grid.Row="1" ItemsSource="{Binding View}" Background="Transparent" BorderThickness="0"
+                          PreviewMouseLeftButtonUp="ProcessList_PreviewMouseLeftButtonUp"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListView.ItemContainerStyle>
@@ -122,9 +123,11 @@
                                     <ColumnDefinition Width="84" />
                                 </Grid.ColumnDefinitions>
 
-                                <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                          IsEnabled="{Binding CanSelect}"
-                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <ToggleButton Grid.Column="0" Style="{StaticResource AppCheckStyle}"
+                                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                              IsEnabled="{Binding CanSelect}"
+                                              AutomationProperties.Name="{Binding Name, StringFormat=Select {0}}"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center" />
 
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,8,0">
                                     <StackPanel Orientation="Horizontal">

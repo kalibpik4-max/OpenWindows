@@ -1,4 +1,5 @@
-using System.Windows.Media.Imaging;
+using System.Windows.Automation.Peers;
+using System.Windows.Automation.Provider;
 using OpenWindows.ViewModels;
 
 namespace OpenWindows.Services;
@@ -28,6 +29,11 @@ public static class ScreenshotRunner
                         }
                     });
                     await Task.Delay(2600);
+                    if (string.Equals(page, "Optimize", StringComparison.OrdinalIgnoreCase))
+                    {
+                        window.Dispatcher.Invoke(() => ClickScanButton(window));
+                        await Task.Delay(16000);
+                    }
                     var target = Path.Combine(directory, "shot-" + page.ToLowerInvariant() + ".png");
                     window.Dispatcher.Invoke(() => Capture(window, target));
                     Log.Write("Screenshot saved: " + target);
@@ -38,6 +44,39 @@ public static class ScreenshotRunner
                 Log.Write("Screenshot run failed: " + ex.Message);
             }
         });
+    }
+
+    private static void ClickScanButton(Window window)
+    {
+        var button = FindDescendant<Button>(window, b => b.Content is "Scan my PC");
+        if (button == null)
+        {
+            return;
+        }
+        var peer = new ButtonAutomationPeer(button);
+        if (peer.GetPattern(PatternInterface.Invoke) is IInvokeProvider invoke)
+        {
+            invoke.Invoke();
+        }
+    }
+
+    private static T? FindDescendant<T>(DependencyObject root, Func<T, bool> match) where T : DependencyObject
+    {
+        var count = VisualTreeHelper.GetChildrenCount(root);
+        for (var i = 0; i < count; i++)
+        {
+            var child = VisualTreeHelper.GetChild(root, i);
+            if (child is T typed && match(typed))
+            {
+                return typed;
+            }
+            var found = FindDescendant(child, match);
+            if (found != null)
+            {
+                return found;
+            }
+        }
+        return null;
     }
 
     private static void Capture(Window window, string path)

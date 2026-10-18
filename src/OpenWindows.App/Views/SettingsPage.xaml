@@ -54,7 +54,7 @@
                         <ui:Button Margin="0,10,0,0" HorizontalAlignment="Left" Content="Send a test notification"
                                    Command="{Binding TestToastCommand}">
                             <ui:Button.Icon>
-                                <ui:SymbolIcon Symbol="Bell24" />
+                                <ui:SymbolIcon Symbol="Alert24" />
                             </ui:Button.Icon>
                         </ui:Button>
                     </StackPanel>
@@ -78,7 +78,7 @@
                         <ui:Button Margin="0,0,0,0" HorizontalAlignment="Left" Content="Restart as administrator"
                                    Command="{Binding RestartAsAdminCommand}">
                             <ui:Button.Style>
-                                <Style TargetType="ui:Button">
+                                <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsAdmin}" Value="False">

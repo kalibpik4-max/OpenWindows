@@ -197,9 +197,11 @@
                             <ui:TextBlock FontTypography="Caption" Appearance="Secondary"
                                           Text="Performance health" />
                             <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                                <ui:TextBlock FontTypography="Display" Text="{Binding HealthScoreText}" />
+                                <ui:TextBlock FontTypography="Display" Text="{Binding HealthScoreText}"
+                                              Margin="0,0,14,0"
+                                              Visibility="{Binding HasHealthScore, Converter={StaticResource BoolToVis}}" />
                                 <ui:TextBlock FontTypography="Subtitle" Text="{Binding HealthLabel}"
-                                              Margin="14,0,0,8" VerticalAlignment="Bottom" />
+                                              Margin="0,0,0,8" VerticalAlignment="Bottom" />
                             </StackPanel>
                             <TextBlock Text="{Binding HealthDescription}" TextWrapping="Wrap"
                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,6,0,0" />
@@ -255,7 +257,7 @@
                         <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" Margin="0,2,0,0"
                                       Text="From the most recent scan. Run Scan now to refresh." />
 
-                        <TextBlock Text="No scan yet - run one to see what this PC can improve."
+                        <TextBlock Text="Run a scan to fill this list."
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                    Margin="0,12,0,0" TextWrapping="Wrap">
                             <TextBlock.Style>

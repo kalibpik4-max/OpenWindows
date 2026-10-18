@@ -38,8 +38,8 @@ public sealed class ProcessesViewModel : ViewModelBase
         View.LiveSortingProperties.Add(nameof(ProcessItemVM.SortScore));
 
         RefreshCommand = new AsyncRelayCommand(RefreshAsync);
-        EndSelectedCommand = new AsyncRelayCommand(EndSelectedAsync);
-        EndUnusedCommand = new AsyncRelayCommand(EndUnusedAsync);
+        EndSelectedCommand = new AsyncRelayCommand(EndSelectedAsync, () => SelectedCount > 0);
+        EndUnusedCommand = new AsyncRelayCommand(EndUnusedAsync, () => Items.Any(i => i.IsUnused && !i.IsProtected));
         EndOneCommand = new AsyncRelayCommand<ProcessItemVM>(EndOneAsync);
         SelectUnusedCommand = new RelayCommand(SelectUnused);
         ClearSelectionCommand = new RelayCommand(ClearSelection);
@@ -156,6 +156,8 @@ public sealed class ProcessesViewModel : ViewModelBase
             : $"{Items.Count} processes running - {unused.Count} not in use, about {unusedRam:0.0} GB reclaimable.";
         OnPropertyChanged(nameof(SelectedCount));
         OnPropertyChanged(nameof(EndSelectedText));
+        EndSelectedCommand.RaiseCanExecuteChanged();
+        EndUnusedCommand.RaiseCanExecuteChanged();
     }
 
     private void SelectUnused()
@@ -254,6 +256,7 @@ public sealed class ProcessesViewModel : ViewModelBase
         {
             OnPropertyChanged(nameof(SelectedCount));
             OnPropertyChanged(nameof(EndSelectedText));
+            EndSelectedCommand.RaiseCanExecuteChanged();
         }
     }
 }

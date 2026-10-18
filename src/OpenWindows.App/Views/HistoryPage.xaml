@@ -108,7 +108,7 @@
                                        Command="{Binding DataContext.UndoSessionCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                        CommandParameter="{Binding}">
                                 <ui:Button.Style>
-                                    <Style TargetType="ui:Button">
+                                    <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
                                         <Setter Property="Visibility" Value="Visible" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsReverted}" Value="True">

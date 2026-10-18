@@ -22,7 +22,7 @@ public sealed class OptimizeViewModel : ViewModelBase
 
     private bool isScanning;
     private bool isApplying;
-    private string scanStatus = "Ready. Click \"Scan my PC\" to look for startup bloat, services, tweaks and cleanup. Not running as admin items are marked.";
+    private string scanStatus = "";
     private double scanProgress;
     private string resultText = "";
 

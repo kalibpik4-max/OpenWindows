@@ -53,6 +53,6 @@ public sealed class ProcessRowVM
         : RamMb + " MB";
     public string CpuLevel => CpuPercent >= 25 ? "High" : CpuPercent >= 8 ? "Medium" : "Low";
     public bool IsBackground => !HasWindow;
-    public string StatusText => HasWindow ? "In use" : "Background";
+    public string StatusText => !CanEnd ? "Protected" : HasWindow ? "In use" : "Background";
     public bool CanEnd => !ProtectedProcesses.IsProtected(Name);
 }
