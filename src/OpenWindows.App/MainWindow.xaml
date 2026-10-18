@@ -9,6 +9,7 @@
                 Width="1120" Height="740" MinWidth="920" MinHeight="620"
                 WindowStartupLocation="CenterScreen"
                 WindowBackdropType="Mica"
+                FontFamily="{StaticResource AppFont}"
                 ExtendsContentIntoTitleBar="True"
                 WindowCornerPreference="Round"
                 Foreground="{DynamicResource TextFillColorPrimaryBrush}">

@@ -11,12 +11,6 @@
             </ResourceDictionary.MergedDictionaries>
 
             <FontFamily x:Key="AppFont">Segoe UI Variable Text, Segoe UI, Arial</FontFamily>
-            <Style TargetType="Window">
-                <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-            </Style>
-            <Style TargetType="ui:FluentWindow">
-                <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
-            </Style>
             <Style x:Key="CardStyle" TargetType="Border">
                 <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}" />
