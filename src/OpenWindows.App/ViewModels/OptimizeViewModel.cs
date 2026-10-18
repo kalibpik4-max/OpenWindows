@@ -136,6 +136,8 @@ public sealed class OptimizeViewModel : ViewModelBase
         try
         {
             var findings = await AppServices.Scanner.ScanAllAsync(progress, scanCancellation.Token);
+            AppState.LastScanFindings = findings;
+            AppState.LastScanTime = DateTime.Now;
             foreach (var finding in findings)
             {
                 var item = new FindingItemVM(finding);

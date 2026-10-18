@@ -232,8 +232,8 @@ public sealed class DashboardViewModel : ViewModelBase
         < 0 => "Run a scan and the health score appears here.",
         >= 90 => "This PC is in great shape. Keep it that way with the occasional scan.",
         >= 75 => "Solid overall. A few fixes below could free up CPU, RAM or disk.",
-        >= 50 => "There is real room for improvement - run a scan and apply the safe fixes.",
-        _ => "Lots of easy wins available - start with a scan."
+        >= 50 => "There is real room for improvement - apply the safe fixes below to boost this score.",
+        _ => "Plenty of easy wins in the findings - apply the safe ones and watch this score climb."
     };
 
     public string LastScanText
@@ -263,8 +263,8 @@ public sealed class DashboardViewModel : ViewModelBase
             var caution = actionables.Count(f => f.Risk == RiskLevel.Caution);
             var (_, diskFreeGb, diskTotalGb) = SystemInfoService.GetDiskUsage("C");
             var diskFreePercent = diskTotalGb > 0 ? diskFreeGb / diskTotalGb * 100 : 100;
-            var penalty = safe * 3 + caution * 1 + (diskFreePercent < 20 ? 8 : 0);
-            healthScore = Math.Clamp(100 - (int)penalty, 0, 100);
+            var penalty = safe * 1 + caution * 2 + (diskFreePercent < 20 ? 8 : 0);
+            healthScore = Math.Clamp(100 - (int)penalty, 25, 100);
             OpenIssueCount = actionables.Count;
             LastScanText = $"Last scan: {AppState.LastScanTime:g} - {OpenIssueCount} actionable findings.";
 

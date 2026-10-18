@@ -45,6 +45,7 @@ public sealed class MonitorViewModel : ViewModelBase
         if (AppServices.Monitor.Latest is { } latest)
         {
             UpdateTexts(latest);
+            UpdateProcessRows(latest);
         }
 
         RefreshPowerPlan();
@@ -168,20 +169,25 @@ public sealed class MonitorViewModel : ViewModelBase
         {
             AppendPoint(sample);
             UpdateTexts(sample);
-            Processes.Clear();
-            foreach (var process in sample.TopProcesses)
-            {
-                Processes.Add(new ProcessRowVM
-                {
-                    Name = process.Name,
-                    Id = process.Id,
-                    CpuPercent = process.CpuPercent,
-                    RamMb = process.RamMb,
-                    HasWindow = process.HasWindow
-                });
-            }
+            UpdateProcessRows(sample);
             IsMonitoring = true;
         });
+    }
+
+    private void UpdateProcessRows(MonitorSample sample)
+    {
+        Processes.Clear();
+        foreach (var process in sample.TopProcesses)
+        {
+            Processes.Add(new ProcessRowVM
+            {
+                Name = process.Name,
+                Id = process.Id,
+                CpuPercent = process.CpuPercent,
+                RamMb = process.RamMb,
+                HasWindow = process.HasWindow
+            });
+        }
     }
 
     private async Task EndProcessAsync(ProcessRowVM row)
