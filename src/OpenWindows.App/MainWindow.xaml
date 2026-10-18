@@ -1,0 +1,91 @@
+﻿<ui:FluentWindow x:Class="OpenWindows.MainWindow"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Wpf"
+                xmlns:pages="clr-namespace:OpenWindows.Views"
+                Title="OpenWindows"
+                Icon="pack://application:,,,/Assets/app.ico"
+                Width="1120" Height="740" MinWidth="920" MinHeight="620"
+                WindowStartupLocation="CenterScreen"
+                WindowBackdropType="Mica"
+                ExtendsContentIntoTitleBar="True"
+                WindowCornerPreference="Round"
+                Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="OpenWindows" CloseWindowByDoubleClickOnIcon="True">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="pack://application:,,,/Assets/app.ico" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
+
+        <ui:NavigationView x:Name="RootNavigation" Grid.Row="1"
+                           PaneDisplayMode="Left"
+                           IsPaneOpen="True"
+                           OpenPaneLength="248"
+                           IsBackButtonVisible="Collapsed"
+                           IsPaneToggleVisible="False">
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem Content="Dashboard" TargetPageType="{x:Type pages:DashboardPage}"
+                                       NavigationCacheMode="Enabled">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="Home24" />
+                    </ui:NavigationViewItem.Icon>
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="Optimize" TargetPageType="{x:Type pages:OptimizePage}"
+                                       NavigationCacheMode="Enabled">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="Broom24" />
+                    </ui:NavigationViewItem.Icon>
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="Monitor" TargetPageType="{x:Type pages:MonitorPage}"
+                                       NavigationCacheMode="Enabled">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="Gauge24" />
+                    </ui:NavigationViewItem.Icon>
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="History" TargetPageType="{x:Type pages:HistoryPage}"
+                                       NavigationCacheMode="Enabled">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="History24" />
+                    </ui:NavigationViewItem.Icon>
+                </ui:NavigationViewItem>
+            </ui:NavigationView.MenuItems>
+            <ui:NavigationView.FooterMenuItems>
+                <ui:NavigationViewItem Content="Settings" TargetPageType="{x:Type pages:SettingsPage}"
+                                       NavigationCacheMode="Enabled">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="Settings24" />
+                    </ui:NavigationViewItem.Icon>
+                </ui:NavigationViewItem>
+            </ui:NavigationView.FooterMenuItems>
+            <ui:NavigationView.ContentOverlay>
+                <Grid>
+                    <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
+                </Grid>
+            </ui:NavigationView.ContentOverlay>
+        </ui:NavigationView>
+
+        <ui:ContentDialogHost x:Name="RootContentDialog" Grid.Row="0" Grid.RowSpan="2" />
+
+        <tb:TaskbarIcon x:Name="TrayIcon" Grid.Row="0"
+                        IconSource="pack://application:,,,/Assets/app.ico"
+                        ToolTipText="OpenWindows - performance optimizer"
+                        NoLeftClickDelay="True">
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu>
+                    <MenuItem x:Name="MenuItemShow" Header="Open OpenWindows" Click="MenuItemShow_Click" />
+                    <MenuItem x:Name="MenuItemScan" Header="Scan now" Click="MenuItemScan_Click" />
+                    <MenuItem x:Name="MenuItemMonitor" Header="Start monitoring" Click="MenuItemMonitor_Click" />
+                    <Separator />
+                    <MenuItem x:Name="MenuItemExit" Header="Exit" Click="MenuItemExit_Click" />
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
+    </Grid>
+</ui:FluentWindow>

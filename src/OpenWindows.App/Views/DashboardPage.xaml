@@ -1,0 +1,187 @@
+<Page x:Class="OpenWindows.Views.DashboardPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:vm="clr-namespace:OpenWindows.ViewModels"
+      Title="Dashboard"
+      Background="Transparent">
+    <Grid Margin="28,12,28,0">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,28">
+            <StackPanel>
+                <ui:TextBlock FontTypography="Title" Text="Dashboard" />
+                <ui:TextBlock FontTypography="Body" Appearance="Secondary" Margin="0,4,0,20" TextWrapping="Wrap"
+                              Text="Your PC at a glance. Live numbers update whenever monitoring is running." />
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,12,0">
+                        <StackPanel>
+                            <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Text="CPU" />
+                            <ui:TextBlock FontTypography="Subtitle" Text="{Binding CpuPercentText}" Margin="0,2,0,0" />
+                            <ProgressBar Value="{Binding CpuPercent, Mode=OneWay}" Maximum="100" Height="4" Margin="0,10,0,8" />
+                            <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" Text="{Binding CpuName}"
+                                          TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="0,0,12,0">
+                        <StackPanel>
+                            <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Text="Memory" />
+                            <ui:TextBlock FontTypography="Subtitle" Text="{Binding RamText}" Margin="0,2,0,0" />
+                            <ProgressBar Value="{Binding RamPercent, Mode=OneWay}" Maximum="100" Height="4" Margin="0,10,0,8" />
+                            <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" Text="RAM in use" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Style="{StaticResource CardStyle}" Margin="0,0,12,0">
+                        <StackPanel>
+                            <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Text="Disk C:" />
+                            <ui:TextBlock FontTypography="Subtitle" Text="{Binding DiskText}" Margin="0,2,0,0" />
+                            <ProgressBar Value="{Binding DiskPercent, Mode=OneWay}" Maximum="100" Height="4" Margin="0,10,0,8" />
+                            <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" Text="Space used" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="3" Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Text="System" />
+                            <ui:TextBlock FontTypography="BodyStrong" Text="{Binding OsDetail}" Margin="0,4,0,0"
+                                          TextWrapping="Wrap" />
+                            <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" Text="{Binding CpuDetail}"
+                                          Margin="0,6,0,0" TextWrapping="Wrap" />
+                            <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" Text="{Binding UptimeDetail}"
+                                          Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Grid Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,12,0">
+                        <StackPanel>
+                            <ui:TextBlock FontTypography="Caption" Appearance="Secondary"
+                                          Text="Performance health" />
+                            <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                <ui:TextBlock FontTypography="Display" Text="{Binding HealthScoreText}" />
+                                <ui:TextBlock FontTypography="Subtitle" Text="{Binding HealthLabel}"
+                                              Margin="14,0,0,8" VerticalAlignment="Bottom" />
+                            </StackPanel>
+                            <TextBlock Text="{Binding HealthDescription}" TextWrapping="Wrap"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,6,0,0" />
+                            <TextBlock Text="{Binding LastScanText}" TextWrapping="Wrap" Margin="0,10,0,0"
+                                       Foreground="{DynamicResource TextFillColorTertiaryBrush}" FontSize="12" />
+                            <ui:Button Margin="0,14,0,0" HorizontalAlignment="Left" Appearance="Primary"
+                                       Content="Scan now" Command="{Binding ScanNowCommand}">
+                                <ui:Button.Icon>
+                                    <ui:SymbolIcon Symbol="Search24" />
+                                </ui:Button.Icon>
+                            </ui:Button>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Text="Quick actions" />
+                            <ui:Button Margin="0,12,0,0" HorizontalAlignment="Stretch"
+                                       HorizontalContentAlignment="Left" Content="Start monitoring"
+                                       Command="{Binding OpenMonitorCommand}">
+                                <ui:Button.Icon>
+                                    <ui:SymbolIcon Symbol="Play24" />
+                                </ui:Button.Icon>
+                            </ui:Button>
+                            <ui:Button Margin="0,8,0,0" HorizontalAlignment="Stretch"
+                                       HorizontalContentAlignment="Left" Content="Undo last changes"
+                                       Command="{Binding UndoLastCommand}">
+                                <ui:Button.Icon>
+                                    <ui:SymbolIcon Symbol="ArrowUndo24" />
+                                </ui:Button.Icon>
+                            </ui:Button>
+                            <ui:Button Margin="0,8,0,0" HorizontalAlignment="Stretch"
+                                       HorizontalContentAlignment="Left" Content="View history"
+                                       Command="{Binding OpenHistoryCommand}">
+                                <ui:Button.Icon>
+                                    <ui:SymbolIcon Symbol="History24" />
+                                </ui:Button.Icon>
+                            </ui:Button>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,16,0,0">
+                    <StackPanel>
+                        <ui:TextBlock FontTypography="BodyStrong" Text="Top findings" />
+                        <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" Margin="0,2,0,0"
+                                      Text="From the most recent scan. Run Scan now to refresh." />
+
+                        <TextBlock Text="No scan yet - run one to see what this PC can improve."
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   Margin="0,12,0,0" TextWrapping="Wrap">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasRecentFindings}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <ItemsControl ItemsSource="{Binding RecentFindings}" Margin="0,4,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:FindingItemVM}">
+                                    <Grid Margin="0,8,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Ellipse Width="8" Height="8" VerticalAlignment="Center" Margin="0,0,10,0">
+                                            <Ellipse.Style>
+                                                <Style TargetType="Ellipse">
+                                                    <Setter Property="Fill"
+                                                            Value="{DynamicResource TextFillColorTertiaryBrush}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSafe}" Value="True">
+                                                            <Setter Property="Fill"
+                                                                    Value="{DynamicResource SystemFillColorSuccessBrush}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsCaution}" Value="True">
+                                                            <Setter Property="Fill"
+                                                                    Value="{DynamicResource SystemFillColorCautionBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Ellipse.Style>
+                                        </Ellipse>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding Title}" TextWrapping="Wrap"
+                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                            <TextBlock Text="{Binding Detail}" TextWrapping="Wrap" FontSize="12"
+                                                       Margin="0,2,0,0"
+                                                       Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="{Binding CategoryLabel}" FontSize="11"
+                                                   Margin="12,2,0,0" VerticalAlignment="Top"
+                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

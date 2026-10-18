@@ -1,0 +1,121 @@
+<Page x:Class="OpenWindows.Views.SettingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      Title="Settings"
+      Background="Transparent">
+    <Grid Margin="24,12,24,0">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,28">
+            <StackPanel>
+                <ui:TextBlock FontTypography="Title" Text="Settings" />
+                <ui:TextBlock FontTypography="Body" Appearance="Secondary" Margin="0,4,0,20" TextWrapping="Wrap"
+                              Text="Tune how OpenWindows looks, monitors and notifies." />
+
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel>
+                        <ui:TextBlock FontTypography="BodyStrong" Text="Appearance" />
+                        <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" Margin="0,2,0,10"
+                                      Text="Theme applies immediately." />
+                        <RadioButton Content="Use system theme" GroupName="Theme"
+                                     IsChecked="{Binding ThemeIsSystem, Mode=TwoWay}" />
+                        <RadioButton Content="Light" GroupName="Theme" Margin="0,8,0,0"
+                                     IsChecked="{Binding ThemeIsLight, Mode=TwoWay}" />
+                        <RadioButton Content="Dark" GroupName="Theme" Margin="0,8,0,0"
+                                     IsChecked="{Binding ThemeIsDark, Mode=TwoWay}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,14,0,0">
+                    <StackPanel>
+                        <ui:TextBlock FontTypography="BodyStrong" Text="Monitoring" />
+                        <CheckBox Content="Alert me when CPU stays high" Margin="0,10,0,0"
+                                  IsChecked="{Binding CpuAlertsEnabled, Mode=TwoWay}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                            <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Width="120"
+                                          VerticalAlignment="Center" Text="Alert threshold" />
+                            <Slider Width="200" Minimum="50" Maximum="100" TickFrequency="5"
+                                    IsSnapToTickEnabled="True" Value="{Binding AlertThreshold, Mode=TwoWay}"
+                                    VerticalAlignment="Center" />
+                            <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Margin="12,0,0,0"
+                                          VerticalAlignment="Center" Text="{Binding AlertThresholdText}" />
+                        </StackPanel>
+                        <CheckBox Content="Start monitoring automatically when OpenWindows starts"
+                                  Margin="0,10,0,0" IsChecked="{Binding MonitoringAutoStart, Mode=TwoWay}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,14,0,0">
+                    <StackPanel>
+                        <ui:TextBlock FontTypography="BodyStrong" Text="Notifications" />
+                        <CheckBox Content="Show Windows toast notifications" Margin="0,10,0,0"
+                                  IsChecked="{Binding ToastNotificationsEnabled, Mode=TwoWay}" />
+                        <ui:Button Margin="0,10,0,0" HorizontalAlignment="Left" Content="Send a test notification"
+                                   Command="{Binding TestToastCommand}">
+                            <ui:Button.Icon>
+                                <ui:SymbolIcon Symbol="Bell24" />
+                            </ui:Button.Icon>
+                        </ui:Button>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,14,0,0">
+                    <StackPanel>
+                        <ui:TextBlock FontTypography="BodyStrong" Text="Window and startup" />
+                        <CheckBox Content="Minimize to the tray instead of the taskbar" Margin="0,10,0,0"
+                                  IsChecked="{Binding MinimizeToTray, Mode=TwoWay}" />
+                        <CheckBox Content="Start OpenWindows when Windows starts (starts in the tray)"
+                                  Margin="0,10,0,0" IsChecked="{Binding RunAtStartup, Mode=TwoWay}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,14,0,0">
+                    <StackPanel>
+                        <ui:TextBlock FontTypography="BodyStrong" Text="Administrator" />
+                        <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Margin="0,6,0,10"
+                                      TextWrapping="Wrap" Text="{Binding AdminStatusText}" />
+                        <ui:Button Margin="0,0,0,0" HorizontalAlignment="Left" Content="Restart as administrator"
+                                   Command="{Binding RestartAsAdminCommand}">
+                            <ui:Button.Style>
+                                <Style TargetType="ui:Button">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsAdmin}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:Button.Style>
+                            <ui:Button.Icon>
+                                <ui:SymbolIcon Symbol="ShieldKeyhole24" />
+                            </ui:Button.Icon>
+                        </ui:Button>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,14,0,0">
+                    <StackPanel>
+                        <ui:TextBlock FontTypography="BodyStrong" Text="Files" />
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                            <ui:Button Content="Open log" Command="{Binding OpenLogCommand}" Margin="0,0,8,0" />
+                            <ui:Button Content="Open backups" Command="{Binding OpenBackupsCommand}"
+                                       Margin="0,0,8,0" />
+                            <ui:Button Content="Open disabled startup" Command="{Binding OpenDisabledStartupCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,14,0,0">
+                    <StackPanel>
+                        <ui:TextBlock FontTypography="BodyStrong" Text="About" />
+                        <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Margin="0,6,0,0"
+                                      Text="{Binding VersionText}" />
+                        <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" Margin="0,4,0,10" TextWrapping="Wrap"
+                                      Text="A friendly Windows performance improver. Most changes are reversible from the History page." />
+                        <ui:Button HorizontalAlignment="Left" Content="Open GitHub repository"
+                                   Command="{Binding OpenRepoCommand}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

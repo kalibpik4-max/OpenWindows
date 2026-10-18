@@ -1,0 +1,167 @@
+<Page x:Class="OpenWindows.Views.OptimizePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:vm="clr-namespace:OpenWindows.ViewModels"
+      Title="Optimize"
+      Background="Transparent">
+    <Grid Margin="24,12,24,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <ui:TextBlock FontTypography="Title" Text="Optimize" />
+            <ui:TextBlock FontTypography="Body" Appearance="Secondary" Margin="0,4,0,12" TextWrapping="Wrap"
+                          Text="Scan finds startup bloat, unneeded services and tasks, tweaks and cleanup wins. Checked items are applied when you click Apply." />
+
+            <Border Style="{StaticResource CardStyle}" Padding="12">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:Button Appearance="Primary" Content="Scan my PC" Command="{Binding ScanCommand}">
+                            <ui:Button.Icon>
+                                <ui:SymbolIcon Symbol="Search24" />
+                            </ui:Button.Icon>
+                        </ui:Button>
+                        <ui:Button Margin="8,0,0,0" Content="Check safe only" Command="{Binding CheckSafeCommand}" />
+                        <ui:Button Margin="8,0,0,0" Content="Uncheck all" Command="{Binding UncheckAllCommand}" />
+                        <ui:Button Margin="8,0,0,0" Content="Restart as admin"
+                                   Command="{Binding RestartAsAdminCommand}">
+                            <ui:Button.Style>
+                                <Style TargetType="ui:Button">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsAdmin}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:Button.Style>
+                            <ui:Button.Icon>
+                                <ui:SymbolIcon Symbol="ShieldKeyhole24" />
+                            </ui:Button.Icon>
+                        </ui:Button>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,10,0,0">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsProgressVisible}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <ProgressBar Value="{Binding ScanProgress, Mode=OneWay}" Maximum="100" Height="4" />
+                    </StackPanel>
+
+                    <ui:TextBlock FontTypography="Caption" Appearance="Secondary" Margin="0,10,0,0"
+                                  TextWrapping="Wrap" Text="{Binding ScanStatus}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,14,0,0" Padding="8">
+            <ListView ItemsSource="{Binding Findings}" Background="Transparent" BorderThickness="0"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Padding" Value="8,4" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:FindingItemVM}">
+                        <Grid Margin="0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" IsEnabled="{Binding HasAction}"
+                                      VerticalAlignment="Top" Margin="2,3,12,0" />
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{Binding Title}" TextWrapping="Wrap" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                <TextBlock Text="{Binding Detail}" TextWrapping="Wrap" FontSize="12" Margin="0,3,0,0"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Text="{Binding CategoryLabel}" FontSize="11" Margin="0,3,0,0"
+                                           Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                            </StackPanel>
+                            <Border Grid.Column="2" Margin="12,2,0,0">
+                                <Border.Style>
+                                    <Style TargetType="Border" BasedOn="{StaticResource BadgeStyle}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSafe}" Value="True">
+                                                <Setter Property="Background"
+                                                        Value="{DynamicResource SystemFillColorSuccessBackgroundBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsCaution}" Value="True">
+                                                <Setter Property="Background"
+                                                        Value="{DynamicResource SystemFillColorCautionBackgroundBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsInfo}" Value="True">
+                                                <Setter Property="Background"
+                                                        Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="{Binding RiskLabel}" FontSize="11" FontWeight="SemiBold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground"
+                                                    Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSafe}" Value="True">
+                                                    <Setter Property="Foreground"
+                                                            Value="{DynamicResource SystemFillColorSuccessBrush}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsCaution}" Value="True">
+                                                    <Setter Property="Foreground"
+                                                            Value="{DynamicResource SystemFillColorCautionBrush}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Border>
+
+        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Margin="0,14,0,0" Padding="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <ui:TextBlock FontTypography="Caption" Appearance="Tertiary" TextWrapping="Wrap"
+                                  Text="{Binding AdminStatusText}" />
+                    <ui:TextBlock FontTypography="BodyStrong" Margin="0,4,0,0" TextWrapping="Wrap"
+                                  Text="{Binding ResultText}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <ui:Button Content="Undo last changes" Command="{Binding UndoCommand}" Margin="0,0,8,0">
+                        <ui:Button.Icon>
+                            <ui:SymbolIcon Symbol="ArrowUndo24" />
+                        </ui:Button.Icon>
+                    </ui:Button>
+                    <ui:Button Appearance="Primary" Content="{Binding ApplyButtonText}"
+                               Command="{Binding ApplyCommand}">
+                        <ui:Button.Icon>
+                            <ui:SymbolIcon Symbol="Checkmark24" />
+                        </ui:Button.Icon>
+                    </ui:Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

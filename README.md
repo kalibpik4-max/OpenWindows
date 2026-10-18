@@ -6,9 +6,9 @@ Built as a native Windows desktop app (C# / .NET 8 / WPF, Fluent UI) with live s
 
 ## Status
 
-In development. The original PowerShell prototype lives in [`legacy/`](legacy/WinOptimizer/).
+Working preview (0.9.0). Core scanning, fixing, undo, monitoring, tray icon and toast notifications are implemented; the UI is still being polished.
 
-## Planned features
+## Features
 
 - **Dashboard** - system info and a performance health score at a glance
 - **Optimize** - scans startup apps, services, scheduled tasks, Windows tweaks, disk cleanup targets and current CPU/RAM hogs; every finding is explained, risk-labelled and opt-in
@@ -25,11 +25,14 @@ Requires the .NET 8 SDK.
 dotnet build OpenWindows.sln -c Release
 ```
 
+Run the app from `src/OpenWindows.App/bin/Release/net8.0-windows10.0.19041.0/win-x64/OpenWindows.exe`.
+
 Headless modes (no UI, used for testing):
 
 ```
 OpenWindows.exe --console     # run a scan, print findings, exit
 OpenWindows.exe --selftest    # sandboxed apply/undo round-trip tests
+OpenWindows.exe --tray        # start minimized to the tray
 ```
 
 ## Legacy
